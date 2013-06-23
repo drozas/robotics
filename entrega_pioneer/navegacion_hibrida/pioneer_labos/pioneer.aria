@@ -1,0 +1,73 @@
+;  Robot parameter file
+
+;  General settings
+Class Pioneer            ; general type of robot
+Subclass p2de            ; specific type of robot
+RobotRadius 250          ; radius in mm
+RobotDiagonal 120        ; half-height to diagonal of octagon
+Holonomic true           ; turns in own radius
+MaxRVelocity 500         ; absolute maximum degrees / sec
+MaxVelocity 2200         ; absolute maximum mm / sec
+HasMoveCommand true      ; has built in move command
+RequestIOPackets false   ; automatically request IO packets
+SwitchToBaudRate 38400   ; switch to this baud if non-0 and supported on robot
+
+;  Conversion factors
+AngleConvFactor 0.001534 ; radians per angular unit (2PI/4096)
+DistConvFactor 0.969     ; multiplier to mm from robot units
+VelConvFactor 1          ; multiplier to mm/sec from robot units
+RangeConvFactor 0.268    ; multiplier to mm from sonar units
+DiffConvFactor 0.0056    ; ratio of angular velocity to wheel velocity
+Vel2Divisor 20           ; divisor for VEL2 commands
+
+;  Accessories the robot has
+TableSensingIR false     ; if robot has upwards facing table sensing IR
+NewTableSensingIR false  ; if table sensing IR are sent in IO packet
+FrontBumpers false       ; if robot has a front bump ring
+NumFrontBumpers 5        ; number of front bumpers on the robot
+RearBumpers false        ; if the robot has a rear bump ring
+NumRearBumpers 5         ; number of rear bumpres on the robot
+
+;  Sonar parameters
+SonarNum 16              ; number of sonar on the robot
+;  SonarUnit <sonarNumber> <x position, mm> <y position, mm> <heading of disc,
+;  degrees>
+SonarUnit 0 115 130 90
+SonarUnit 1 155 115 50
+SonarUnit 2 190 80 30
+SonarUnit 3 210 25 10
+SonarUnit 4 210 -25 -10
+SonarUnit 5 190 -80 -30
+SonarUnit 6 155 -115 -50
+SonarUnit 7 115 -130 -90
+SonarUnit 8 -115 -130 -90
+SonarUnit 9 -155 -115 -130
+SonarUnit 10 -190 -80 -150
+SonarUnit 11 -210 -25 -170
+SonarUnit 12 -210 25 170
+SonarUnit 13 -190 80 150
+SonarUnit 14 -155 115 130
+SonarUnit 15 -115 130 90
+
+;  Laser parameters
+LaserPossessed false     ; if there is a laser on the robot
+LaserPort COM3           ; port the laser is on
+LaserFlipped false       ; if the laser is upside-down or not
+LaserPowerControlled true ; if the power to the laser is controlled by serial
+LaserX 17                ; x location of laser, mm
+LaserY 8                 ; y location of laser, mm
+
+;  Movement control parameters, if these are 0 the parameters from robot flash
+;  will be used, otherwise these values will be used
+SettableVelMaxes true    ; if TransVelMax and RotVelMax can be set
+TransVelMax 0            ; maximum desired translational velocity for the robot
+RotVelMax 0              ; maximum desired rotational velocity for the robot
+SettableAccsDecs true    ; if the accel and decel parameters can be set
+TransAccel 0             ; translational acceleration
+TransDecel 0             ; translational deceleration
+RotAccel 0               ; rotational acceleration
+RotDecel 0               ; rotational deceleration
+
+EncodeJitter   0.0      ; Error in distance
+AngleJitter      0.0     ; Error in angular position
+AngleDrift      0.0      ; Angular drift with forward movement

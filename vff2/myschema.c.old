@@ -1,0 +1,237 @@
+#include "jde.h"
+void agrupa_sensores(int sensores[]);
+
+int myschema_brothers[NUM_SCHEMAS];
+arbitration myschema_callforarbitration;
+int myschema_cycle=100; /* ms */
+
+enum myschema_states {init,t1,r1,t2,r2,t3,r3,t4,end};
+static int myschema_state;
+
+void agrupa_sensores(int sensores[])
+{
+	/* Agrupamos todos los sensores en grupos de 20 para dar 9 grupos
+		y cogemos el valor más pequeño de cada grupo*/
+
+	int i;
+	int sumatorio;
+	for (i=0;i<=180;i++)
+	{
+		if ((i>=0) && (i<20)){
+	/*	GRUPO 0*/
+			if (i==0)
+				sumatorio=0;
+			else
+				sumatorio+=laser[i];
+		}
+	/*	GRUPO 1*/
+			if ((i>=20) && (i<40)){
+				if (i==20){
+					/* Metemos el valor medio al grupo anterior	*/
+					sumatorio=sumatorio/20;
+					sensores[0]=sumatorio;
+					sumatorio=0;
+				} else 
+					sumatorio+=laser[i];
+		}
+	/*	GRUPO 2*/
+			if ((i>=40) && (i<60)){
+				if (i==40){
+					/* Metemos el valor medio al grupo anterior	*/
+					sumatorio=sumatorio/20;
+					sensores[1]=sumatorio;
+					sumatorio=0;
+				} else
+					sumatorio+=laser[i];
+		}
+	/*	GRUPO 3*/
+			if ((i>=60) && (i<80)){
+				if (i==60){
+					/* Metemos el valor medio al grupo anterior	*/
+					sumatorio=sumatorio/20;
+					sensores[2]=sumatorio;
+					sumatorio=0;
+				} else
+					sumatorio+=laser[i];
+		}
+	/*	GRUPO 4*/
+			if ((i>=80) && (i<100)){
+				if (i==80){
+					/* Metemos el valor medio al grupo anterior	*/
+					sumatorio=sumatorio/20;
+					sensores[3]=sumatorio;
+					sumatorio=0;
+				} else
+					sumatorio+=laser[i];
+		}
+	/*	GRUPO 5*/
+			if ((i>=100) && (i<120)){
+				if (i==100){
+					/* Metemos el valor medio al grupo anterior	*/
+					sumatorio=sumatorio/20;
+					sensores[4]=sumatorio;
+					sumatorio=0;
+				} else
+					sumatorio+=laser[i];
+		}
+	/*	GRUPO 6*/
+			if ((i>=120) && (i<140)){
+				if (i==120){
+					/* Metemos el valor medio al grupo anterior	*/
+					sumatorio=sumatorio/20;
+					sensores[5]=sumatorio;
+					sumatorio=0;
+				} else
+					sumatorio+=laser[i];
+		}
+	/*	GRUPO 7*/
+			if ((i>=140) && (i<160)){
+				if (i==140){
+					/* Metemos el valor medio al grupo anterior	*/
+					sumatorio=sumatorio/20;
+					sensores[6]=sumatorio;
+					sumatorio=0;
+				} else
+					sumatorio+=laser[i];
+		}
+	/*	GRUPO 8*/
+			if ((i>=160) && (i<180)){
+				if (i==160){
+					/* Metemos el valor medio al grupo anterior	*/
+					sumatorio=sumatorio/20;
+					sensores[7]=sumatorio;
+					sumatorio=0;
+				} else
+					sumatorio+=laser[i];
+		}
+
+			if (i==180){
+					sumatorio=sumatorio/20;
+					sensores[8]=sumatorio;
+			}
+	}
+}
+
+void calcula_fuerza_repulsiva(int sensores[],int grupo,int f_repulsiva[])
+{
+/* Para un grupo de sensores, te calcula su fuerza repulsiva*/
+/* Modulo = Inversamente proporcional a la distancia*/
+/* Angulo = 90 + angulo que abarca*/
+	f_repulsiva[0] = 7600 / sensores[grupo];
+	f_repulsiva[1] = (20 * grupo) + 100;
+}
+
+void 	suma_fuerzas(int f_repulsiva_total[],int f_repulsiva_aux[])
+{
+/* Dadas dos fuerzas, calcula la suma de ellas*/
+printf("Sumamos las fuerzas [%i,%i] + [%i,%i]\n",f_repulsiva_total[0],f_repulsiva_total[1],f_repulsiva_aux[0],f_repulsiva_aux[1]);
+}
+
+void 	calcula_fuerza_repulsiva_total(int sensores[],int f_repulsiva_total[])
+{
+	/* Calcula todas las fuerzas repulsiva para el robot, suma todas y te da la
+	fuerza repulsiva total*/
+	int e;
+	int grupo;
+
+	int f_repulsiva[1];
+
+	/* inicializamos la fuerza total*/
+	f_repulsiva_total[0]=0;
+	f_repulsiva_total[1]=0;
+
+	for (e=0;e<=8;e++)
+	{
+		grupo = e;
+		printf("Calculamos fuerza repulsiva para grupo %i",grupo);
+		calcula_fuerza_repulsiva(sensores,grupo,f_repulsiva);
+		printf(" vale [%i,%i]\n",f_repulsiva[0],f_repulsiva[1]);
+		suma_fuerzas(f_repulsiva_total,f_repulsiva);
+	}
+}
+
+void myschema_iteration()
+{  
+	/************************************************
+	 *					PROGRAMA PRINCIPAL									*		 
+   ************************************************/
+	int sensores[8];
+	int i;
+	int f_repulsiva[1];
+	/* f_respulsiva[modulo,angulo]*/
+
+	agrupa_sensores(sensores);
+	for (i=0;i<=8;i++)
+		printf("grupo %i valor medio %i\n",i,sensores[i]);
+	calcula_fuerza_repulsiva_total(sensores,f_repulsiva);
+	
+	
+}
+
+void myschema_suspend()
+{
+  pthread_mutex_lock(&mymutex[SCH_MYSCHEMA]);
+  state[SCH_MYSCHEMA]=slept;
+  printf("myschema: off\n");
+  pthread_mutex_unlock(&mymutex[SCH_MYSCHEMA]);
+}
+
+void myschema_resume(int *brothers, arbitration fn)
+{
+  int i;
+
+  pthread_mutex_lock(&mymutex[SCH_MYSCHEMA]);
+  for(i=0;i<NUM_SCHEMAS;i++) myschema_brothers[i]=-1;
+  i=0;
+  while(brothers[i]!=-1) {myschema_brothers[i]=brothers[i];i++;}
+
+  myschema_callforarbitration=fn;
+  put_state(SCH_MYSCHEMA,notready);
+  printf("myschema: on\n");
+  pthread_cond_signal(&condition[SCH_MYSCHEMA]);
+  pthread_mutex_unlock(&mymutex[SCH_MYSCHEMA]);
+}
+
+void *myschema_thread(void *not_used) 
+{
+  struct timeval a,b;
+  long diff, next;
+
+  for(;;)
+    {
+      pthread_mutex_lock(&mymutex[SCH_MYSCHEMA]);
+
+      if (state[SCH_MYSCHEMA]==slept) 
+	{
+	  /*printf("myschema: off\n");*/
+	  v=0; w=0;
+	  pthread_cond_wait(&condition[SCH_MYSCHEMA],&mymutex[SCH_MYSCHEMA]);
+	  /*printf("myschema: on\n");*/
+
+	  myschema_state=init;
+	}
+      else 
+	{
+	  gettimeofday(&a,NULL);
+	  myschema_iteration();
+	  gettimeofday(&b,NULL);  
+	  diff = (b.tv_sec-a.tv_sec)*1000000+b.tv_usec-a.tv_usec;
+	  
+	  next = myschema_cycle*1000-diff-10000; 
+	  /* discounts 10ms taken by calling usleep itself */
+	  if (next>0) usleep(myschema_cycle*1000-diff);
+	  else {printf("time interval violated: myschema\n"); usleep(myschema_cycle*1000);}
+	}
+      pthread_mutex_unlock(&mymutex[SCH_MYSCHEMA]);
+    }
+}
+
+void myschema_startup()
+{
+  pthread_mutex_lock(&mymutex[SCH_MYSCHEMA]);
+  printf("myschema schema started up\n");
+  state[SCH_MYSCHEMA]=slept;
+  pthread_create(&schema[SCH_MYSCHEMA],NULL,myschema_thread,NULL);
+  pthread_mutex_unlock(&mymutex[SCH_MYSCHEMA]);
+}
+

@@ -1,0 +1,20 @@
+Algoritmo ppal
+--------------
+Recojo ptos.
+	ptoOri = ptoI
+	ptoDest= pto i+1
+	mientras(no haya calculado todas las trayectorias)
+		calculo_trayectoria(pOri,pDestino)
+		mientras no llegue a punto
+			Corrijo()
+
+Funcion Corrijo()
+-----------------
+Ver_distancia(coordRobot,trayectoria)
+	if distancia<>0 then
+		if distancia<0 then
+				gira izquierda
+		else
+			gira derecha
+		/*Y en cada rama, subcasos : no es lo mismo que este muy lejos, a que este muy cerca*/
+

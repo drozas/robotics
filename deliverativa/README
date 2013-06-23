@@ -1,0 +1,33 @@
+2.0, Enero 2004:
+- Incluye el esquema laser_segments (Victor y JoseMaria)
+- Incluye ñapa para descomentar cuando hay problemas con los encoders (que otos escribe con printf los reales separando con PUNTO parte entera y parte decimal, y el scanf de sensationsotos requiere COMA para interpretarlo correctamente).
+
+
+Estos son los cambios realizados, para compilar jde con g++
+
+susan.h:
+	se ha añadido el tipo de las variables( int ).
+	se ha añadido la directiva extern "C" para que linke al estilo C
+
+occupancygrid.h, visualjambs.h:
+	se han completado las declaraciones, para que sean equivalentes a las
+	definiciones contenidas en el .c
+
+sensationsotos.c motors.c:
+	parece ser que en c++ las variables globales son visibles en todo el programa, por lo que no pueden aparecer variables globales con el mismo nombre en diferentes ficheros, a menos que restrinjamos su alcance con static, de manera que solo es accesible por el codigo del fichero. La variable que tenia dicho conflicto era output_buffer, que estaba definida en los dos ficheros, por lo que se a añadido static, para restringir el alcance.
+
+libgrids :
+	se ha añadido la directiva extern "C" para que linke al estilo C
+
+libfuzzy :
+	se ha añadido la directiva extern "C" para que linke al estilo C
+
+makefile de jde :
+	simplemente invoca al makefile creado por qmake de Qt, en el directorio qtgui.
+
+13-11-02
+	Cambio de nombre del proyecto. De jdeQt0.7 pasa a ser dynamicWindow0.0.
+	Se ha restado un error a la lectura de los us para ajustar el modelo de espacio, configurable.
+	
+
+
